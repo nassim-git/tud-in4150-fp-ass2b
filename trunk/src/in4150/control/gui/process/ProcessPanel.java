@@ -12,7 +12,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 
 public class ProcessPanel extends JPanel implements ActionListener
 {
@@ -38,10 +37,6 @@ public class ProcessPanel extends JPanel implements ActionListener
 		fRequestButton.addActionListener(this);
 
 		this.initialize();
-
-		// Start the update task.
-		DataUpdateTask lUpdateTask = new DataUpdateTask();
-		lUpdateTask.execute();
 	}
 
 	private void initialize()
@@ -81,55 +76,18 @@ public class ProcessPanel extends JPanel implements ActionListener
 		}
 	}
 
-	/**
-	 * The DataUpdateTask is a background thread responsible
-	 * for keeping the GUI up to date with the actual system state.
-	 * 
-	 * @author Frits de Nijs
-	 */
-	class DataUpdateTask extends SwingWorker<Void, Void>
+	public void updateNow()
 	{
-		/**
-		 * Equivalent to run in meaning, this function simply handles the updates
-		 * in an infinite loop, waiting some time every cycle.
-		 */
-		@Override
-		protected Void doInBackground()
+		fMutexStatus.updateNow();
+		fRequestStatus.updateNow();
+
+		if (fRequestButton != null && !fProcess.requestedCriticalSection())
 		{
-			// If we ever decide to allow stopping only the GUI, this allows leaving the loop.
-			try
-			{
-			while (!this.isCancelled())
-			{
-				fMutexStatus.updateNow();
-				fRequestStatus.updateNow();
-
-				if (fRequestButton != null && !fProcess.requestedCriticalSection())
-				{
-					fRequestButton.setEnabled(true);
-				}
-				else if (fRequestButton != null)
-				{
-					fRequestButton.setEnabled(false);
-				}
-
-				// Make the update visible.
-				if (isVisible()) repaint();
-
-				try
-				{
-					Thread.sleep(100);
-				}
-				catch (InterruptedException e)
-				{
-				}
-			}
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-			return null;
+			fRequestButton.setEnabled(true);
 		}
+		else if (fRequestButton != null)
+		{
+			fRequestButton.setEnabled(false);
+		}		
 	}
 }

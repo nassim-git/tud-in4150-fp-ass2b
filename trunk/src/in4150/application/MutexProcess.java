@@ -19,7 +19,7 @@ public class MutexProcess implements IGUItoApplication, IMutexToApplication, Run
 	private static final long RUNNING_SLEEP_TIME = 1000;
 
 	// A debugging constant indicating how long a process must spend inside its critical section.
-	private static final long CRITICAL_SECTION_TIME = 1000;
+	private static final long CRITICAL_SECTION_TIME = 500;
 
 	// A debugging constant indicating how likely it is for a Process to enter its critical section.
 	private static final double CRITICAL_SECTION_CHANCE = 0.25;
@@ -94,11 +94,11 @@ public class MutexProcess implements IGUItoApplication, IMutexToApplication, Run
 		// We can only ask for permission if we haven't already.
 		if (!fRequestedCriticalSection && !fInCriticalSection)
 		{
+			// Record our request.
+			fRequestedCriticalSection = true;
+
 			// Ask the controller for permission.
 			fMutexController.requestCriticalSection();
-
-			// And record our request.
-			fRequestedCriticalSection = true;
 		}
 	}
 

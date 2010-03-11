@@ -9,8 +9,8 @@ import java.rmi.registry.Registry;
 
 public class TestMutex
 {
-	private static final int COMPONENTS = 5;
-	private static final boolean MANUAL	= true;
+	private static final int COMPONENTS = 25;
+	private static final boolean MANUAL	= false;
 
 	public static void main(String[] pUnused)
 	{
@@ -46,12 +46,12 @@ public class TestMutex
 
 		if (!MANUAL)
 		{
-			try
+/*			try
 			{
 				Thread.sleep(1000);
 			}
 			catch (InterruptedException lException) {}
-
+*/
 			for (int i = 0; i < COMPONENTS; i++)
 			{
 				lThreads[i] = new Thread(lProcesses[i]);

@@ -8,6 +8,7 @@ import in4150.network.rmi.RMISocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * The RMINetwork is one type of Network that can be used to transmit messages from
@@ -251,7 +252,10 @@ public class RMINetwork implements IRMIClient, IMutexToNetwork
 	@Override
 	public Integer[] getConnectedIDs()
 	{
-		return fConnectedIDs.toArray(new Integer[fConnectedIDs.size()]);
+		Integer[] lResult = new Integer[fConnectedIDs.size()];
+		lResult = fConnectedIDs.toArray(lResult);
+		Arrays.sort(lResult);
+		return lResult;
 	}
 
 	@Override

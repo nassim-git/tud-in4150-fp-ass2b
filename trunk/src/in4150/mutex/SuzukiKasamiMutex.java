@@ -34,6 +34,9 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 	// A flag indicating to the application that it may indeed enter its critical section now.
 	private boolean fCanEnterCS;
 
+	// A flag indicating to the application that it may indeed enter its critical section now.
+	private boolean fProcessingToken;
+
 	/**
 	 * Constructs a new SuzukiKasamiMutex controller for the provided application.
 	 * 
@@ -42,9 +45,10 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 	 */
 	public SuzukiKasamiMutex(IMutexToApplication pApplication, boolean pManualMode)
 	{
-		fApplication = pApplication;
-		fCSRequests	 = new VectorClock();
-		fCanEnterCS  = false;
+		fApplication	 = pApplication;
+		fCSRequests		 = new VectorClock();
+		fCanEnterCS		 = false;
+		fProcessingToken = false;
 
 		if (pManualMode)
 		{
@@ -106,7 +110,7 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 		fCSRequests.put(Integer.toString(pRequest.getRequester()), pRequest.getRequestNumber());
 
 		// If we have the token, we should pass it along to the requesting process.
-		if (this.hasToken())
+		if (this.hasToken() && !fProcessingToken)
 		{
 			sendToken(pRequest.getRequester());
 		}
@@ -119,12 +123,16 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 	 */
 	private void receiveToken(Token pToken)
 	{
-		// Store the token.
-		fToken = pToken;
+		fProcessingToken = true;
 
 		// Allow the parent process access to the critical section.
 		fCanEnterCS = true;
+
+		// Store the token.
+		fToken = pToken;
+
 		fApplication.doCriticalSection();
+
 		fCanEnterCS = false;
 
 		// Update the Token to include knowledge of our satisfied request.
@@ -139,6 +147,7 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 					fCSRequests.get(Integer.toString(lProcess)) > 
 					fToken.getSatisfiedRequests().get(Integer.toString(lProcess)))
 				{
+
 					this.sendToken(lProcess);
 				}
 			}
@@ -157,6 +166,9 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 				}
 			}
 		}
+
+		// Done looking through received requests.
+		fProcessingToken = true;
 	}
 
 	/**
@@ -166,14 +178,16 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 	 */
 	private void sendToken(int lProcess)
 	{
+		Token lToken = fToken;
+
 		// We can only send the token if we have it, and are not using it at the moment.
 		if (this.hasToken() && !this.fCanEnterCS && !fApplication.inCriticalSection())
 		{
-			// We have it, send it.
-			fNetwork.sendMessage(fToken, lProcess);
-
-			// And record that we no longer have it.
+			// Record that we no longer have it.
 			fToken = null;
+
+			// And send it.
+			fNetwork.sendMessage(lToken, lProcess);
 		}
 	}
 

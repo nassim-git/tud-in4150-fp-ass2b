@@ -4,9 +4,11 @@ import in4150.control.gui.network.NetworkPanel;
 import in4150.control.gui.process.ProcessPanel;
 
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 /**
  * The MutexView implements the overall Frame used to display the operation of the
@@ -21,6 +23,8 @@ public class MutexView extends JFrame
 {
 	// Unique Serial ID.
 	private static final long serialVersionUID = -3820402804045322410L;
+
+	private ArrayList<ProcessPanel> fProcesses;
 
 	/**
 	 * Constructs a single frame containing two panels, one for all the processes,
@@ -41,6 +45,7 @@ public class MutexView extends JFrame
 		// If we have processes to display,
 		if (pProcesses != null)
 		{
+			fProcesses = new ArrayList<ProcessPanel>();
 			JPanel lProcessGroup = new JPanel();
 			lProcessGroup.setLayout(new GridLayout(0, 1));
 
@@ -49,7 +54,9 @@ public class MutexView extends JFrame
 			{
 				if (lProcess != null)
 				{
-					lProcessGroup.add(new ProcessPanel(lProcess));
+					ProcessPanel lPanel = new ProcessPanel(lProcess);
+					fProcesses.add(lPanel);
+					lProcessGroup.add(lPanel);
 				}
 			}
 
@@ -61,6 +68,59 @@ public class MutexView extends JFrame
 		{
 			// Add a NetworkPanel.
 			this.add(new NetworkPanel(pNetwork));
+		}
+
+		// If we have processes to display,
+		if (pProcesses != null)
+		{
+			// Start the update task.
+			DataUpdateTask lUpdateTask = new DataUpdateTask();
+			lUpdateTask.execute();
+		}
+	}
+
+	/**
+	 * The DataUpdateTask is a background thread responsible
+	 * for keeping the GUI up to date with the actual system state.
+	 * 
+	 * @author Frits de Nijs
+	 */
+	class DataUpdateTask extends SwingWorker<Void, Void>
+	{
+		/**
+		 * Equivalent to run in meaning, this function simply handles the updates
+		 * in an infinite loop, waiting some time every cycle.
+		 */
+		@Override
+		protected Void doInBackground()
+		{
+			// If we ever decide to allow stopping only the GUI, this allows leaving the loop.
+			try
+			{
+			while (!this.isCancelled())
+			{
+				for (ProcessPanel lPanel : fProcesses)
+				{
+					lPanel.updateNow();
+				}
+
+				// Make the update visible.
+				if (isVisible()) repaint();
+
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException e)
+				{
+				}
+			}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			return null;
 		}
 	}
 }
