@@ -168,7 +168,7 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 		}
 
 		// Done looking through received requests.
-		fProcessingToken = true;
+		fProcessingToken = false;
 	}
 
 	/**
