@@ -5,7 +5,6 @@ import in4150.control.gui.IGUItoMutex;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -45,21 +44,15 @@ public class ProcessPanel extends JPanel implements ActionListener
 
 		this.setLayout(new BorderLayout());
 
-		JPanel lViewPanel = new JPanel();
-		lViewPanel.setLayout(new GridLayout(1,2));
-
 		JPanel lStatusPanel = new JPanel();
-		lViewPanel.setLayout(new GridLayout(1,2));
-
 		JLabel lProcessName = new JLabel("Process " + lMutexControl.getProcessID(), JLabel.LEFT);
 		lProcessName.setPreferredSize(new Dimension(70, 15));
+
 		lStatusPanel.add(lProcessName);
 		lStatusPanel.add(fMutexStatus);
 
-		lViewPanel.add(lStatusPanel);
-		lViewPanel.add(fRequestStatus);
-
-		this.add(lViewPanel, BorderLayout.CENTER);
+		this.add(lStatusPanel, BorderLayout.WEST);
+		this.add(fRequestStatus, BorderLayout.CENTER);
 		this.add(fRequestButton, BorderLayout.EAST);
 	}
 
