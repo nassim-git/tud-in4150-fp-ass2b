@@ -31,6 +31,9 @@ public class NetworkPanel extends JPanel implements ActionListener, Observer
 	// Button to force sending the selected message.
 	private final JButton fTransmitMessage;
 
+	// Which message was selected when it was sent.
+	private int fSelected;
+
 	public NetworkPanel(IGUItoDebugNetwork pMonitoredNetwork)
 	{
 		// Initialize the frame with a title.
@@ -42,6 +45,8 @@ public class NetworkPanel extends JPanel implements ActionListener, Observer
 		// Create the interface elements.
 		fMessageList	 = new JList();
 		fTransmitMessage = new JButton(TRANSMIT_EVENT);
+
+		fSelected = 0;
 
 		// Initialize the interface elements.
 		this.initialize();
@@ -83,6 +88,9 @@ public class NetworkPanel extends JPanel implements ActionListener, Observer
 			// Retrieve the selected message.
 			BufferedMessage lMessage = (BufferedMessage)fMessageList.getSelectedValue();
 
+			// Attempt to extract the selected index.
+			fSelected = fMessageList.getSelectedIndex();
+
 			if (lMessage != null)
 			{
 				// And force the Network to deliver it.
@@ -106,6 +114,6 @@ public class NetworkPanel extends JPanel implements ActionListener, Observer
 		// and update the display.
 		this.repaint();
 
-		fMessageList.setSelectedIndex(0);
+		fMessageList.setSelectedIndex(Math.min(fSelected, ((Object[])pObject).length-1));
 	}
 }

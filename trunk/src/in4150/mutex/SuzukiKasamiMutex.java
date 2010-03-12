@@ -201,7 +201,7 @@ public class SuzukiKasamiMutex implements IGUItoMutex, IApplicationToMutex, INet
 	@Override
 	public boolean canEnterCriticalSection()
 	{
-		return fCanEnterCS;
+		return fCanEnterCS && this.hasToken();
 	}
 
 	@Override

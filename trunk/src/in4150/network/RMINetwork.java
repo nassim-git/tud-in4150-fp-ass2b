@@ -229,10 +229,7 @@ public class RMINetwork implements IRMIClient, IMutexToNetwork
 		{
 			for (int lID : fConnectedIDs)
 			{
-				if (lID != fID)
-				{
-					this.sendMessage(pMessage, lID);
-				}
+				this.sendMessage(pMessage, lID);
 			}
 		}
 	}

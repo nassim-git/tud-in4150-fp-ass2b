@@ -9,8 +9,8 @@ import java.rmi.registry.Registry;
 
 public class TestMutex
 {
-	private static final int COMPONENTS = 25;
-	private static final boolean MANUAL	= false;
+	private static final int COMPONENTS = 5;
+	private static final boolean MANUAL	= true;
 
 	public static void main(String[] pUnused)
 	{
@@ -38,6 +38,7 @@ public class TestMutex
 		for (int i = 0; i < COMPONENTS; i++)
 		{
 			lProcesses[i] = new MutexProcess(MANUAL);
+			lThreads[i]	  = new Thread(lProcesses[i]);
 		}
 
 		MutexView lFrame = new MutexView(lProcesses, lBuffer);
@@ -46,17 +47,6 @@ public class TestMutex
 
 		if (!MANUAL)
 		{
-/*			try
-			{
-				Thread.sleep(1000);
-			}
-			catch (InterruptedException lException) {}
-*/
-			for (int i = 0; i < COMPONENTS; i++)
-			{
-				lThreads[i] = new Thread(lProcesses[i]);
-			}
-
 			for (int i = 0; i < COMPONENTS; i++)
 			{
 				lThreads[i].start();
